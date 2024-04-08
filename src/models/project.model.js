@@ -1,4 +1,4 @@
-import mongoose, {Schema} from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
 const projectSchema = new Schema(
     {
@@ -28,16 +28,7 @@ const projectSchema = new Schema(
                     "{PATH} exceeds the limit of 2",
                 ],
             },
-        ],
-        status: {
-            type: String,
-            enum: ["pending", "in-progress", "evaluated"],
-            default: "pending",
-        },
-        deadline: {
-            type: Date,
-            required: true,
-        }
+        ]
     },
     { timestamps: true }
 );

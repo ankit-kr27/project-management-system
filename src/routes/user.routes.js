@@ -8,7 +8,7 @@ import {
     updateAccountDetails,
     updateUserAvatar,
 } from "../controllers/user.controller.js";
-import { upload } from "../utils/multer.middleware.js";
+import { avatarUpload } from "../utils/multer.middleware.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 
 const router = Router();
@@ -22,7 +22,7 @@ router.route("/change-password").post(verifyJWT, changeCurrentPassword);
 router.route("/update-account").patch(verifyJWT, updateAccountDetails);
 router.route("/update-avatar").patch(
     verifyJWT,
-    upload.single("avatar"),
+    avatarUpload.single("avatar"),
     updateUserAvatar
 );
 
