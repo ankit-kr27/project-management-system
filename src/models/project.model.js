@@ -34,6 +34,10 @@ const projectSchema = new Schema(
             enum: ["pending", "in-progress", "evaluated"],
             default: "pending",
         },
+        deadline: {
+            type: Date,
+            required: true,
+        }
     },
     { timestamps: true }
 );

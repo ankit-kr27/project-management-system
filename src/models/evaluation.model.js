@@ -1,6 +1,6 @@
 import mongoose, { Schema } from "mongoose";
 
-const evaluationSchema = new Schema(
+const submissionSchema = new Schema(
     {
         project: {
             type: Schema.Types.ObjectId,
@@ -35,4 +35,4 @@ const evaluationSchema = new Schema(
     { timestamps: true }
 );
 
-const Evaluation = mongoose.model("Evaluation", evaluationSchema);
+const Submission = mongoose.model("Submission", submissionSchema);

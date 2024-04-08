@@ -9,8 +9,7 @@ const githubIntegrationSchema = new Schema(
         },
         githubAccessToken: { type: String, required: true },
         githubUsername: { type: String, required: true },
-        githubUserId: { type: Number, required: true },
-        createdAt: { type: Date, default: Date.now },
+        githubUserId: { type: Number, required: true }
     },
     { timestamps: true }
 );
