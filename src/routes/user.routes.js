@@ -8,13 +8,13 @@ import {
     updateAccountDetails,
     updateUserAvatar,
 } from "../controllers/user.controller.js";
-import { avatarUpload } from "../utils/multer.middleware.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
+import { avatarUpload } from "../middlewares/multer.middleware.js";
 
 const router = Router();
 
 // *** Routes ***
-router.route("/register").post(upload.single("avatar"), registerUser);
+router.route("/register").post(avatarUpload.single("avatar"), registerUser);
 router.route("/login").post(loginUser);
 router.route("/logout").post(verifyJWT, logOutUser);
 router.route("/refresh-token", refreshAccessToken);

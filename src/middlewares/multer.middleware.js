@@ -10,7 +10,7 @@ const avatarStorage = multer.diskStorage({
     },
 });
 
-export const avatarUpload = multer({
+const avatarUpload = multer({
     storage: avatarStorage,
 });
 
@@ -24,6 +24,8 @@ const zipStorage = multer.diskStorage({
     },
 });
 
-export const zipUpload = multer({
+const zipUpload = multer({
     storage: zipStorage,
 });
+
+export { avatarUpload, zipUpload };
