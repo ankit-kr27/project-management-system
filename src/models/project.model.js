@@ -28,7 +28,19 @@ const projectSchema = new Schema(
                     "{PATH} exceeds the limit of 2",
                 ],
             },
-        ]
+        ],
+        deadline1: {
+            type: Date,
+            required: true,
+        },
+        deadline2: {
+            type: Date,
+            required: true,
+        },
+        isApproved: {
+            type: Boolean,
+            default: false,
+        },
     },
     { timestamps: true }
 );

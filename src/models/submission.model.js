@@ -7,10 +7,14 @@ const submissionSchema = new Schema(
             ref: "Project",
             required: true,
         },
-        status: {
+        stage: {
             type: String,
             enum: ["stage1", "stage2"],
             default: "stage1",
+        },
+        deadline:{
+            type: Date,
+            required: true,
         },
         files: [
             {
@@ -26,6 +30,10 @@ const submissionSchema = new Schema(
                 },
             },
         ],
+        isEvauated: {
+            type: Boolean,
+            default: false,
+        }
     },
     { timestamps: true }
 );

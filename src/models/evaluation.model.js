@@ -2,9 +2,9 @@ import mongoose, { Schema } from "mongoose";
 
 const evaluationSchema = new Schema(
     {
-        project: {
+        submission: {
             type: Schema.Types.ObjectId,
-            ref: "Project",
+            ref: "Submission",
             required: true,
         },
         criteria: {

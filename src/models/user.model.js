@@ -26,6 +26,11 @@ const userSchema = new mongoose.Schema(
             type: String, // cloudinary url
             required: true,
         },
+        dept: {
+            type: String,
+            required: true,
+            trim: true,
+        },
         password: {
             type: String,
             required: [true, "Password is required"],
