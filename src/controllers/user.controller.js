@@ -1,7 +1,7 @@
 import { User } from "../models/user.model.js";
 import { ApiError } from "../utils/ApiError.js";
-import ApiResponse from "../utils/ApiResponse.js";
-import asyncHandler from "../utils/asyncHandler.js";
+import {ApiResponse} from "../utils/ApiResponse.js";
+import {asyncHandler} from "../utils/asyncHandler.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.service.js";
 
 const generateAccessAndRefreshToken = async (userId) => {
@@ -18,10 +18,10 @@ const generateAccessAndRefreshToken = async (userId) => {
 };
 
 const registerUser = asyncHandler(async (req, res) => {
-    const { fullName, email, password, role } = req.body;
+    const { fullName, email, password, role, dept } = req.body;
 
     if (
-        [fullName, email, password, role].some((field) => {
+        [fullName, email, password, role, dept].some((field) => {
             if (field?.trim() === "") {
                 throw new ApiError(400, `${field} is required`);
             }
@@ -55,6 +55,7 @@ const registerUser = asyncHandler(async (req, res) => {
         password,
         role,
         avatar: avatar?.secure_url,
+        dept,
     });
 
     await user.save();
@@ -300,6 +301,24 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, updatedUser, "Avatar updated successfully"));
 });
 
+const getAllStudents = asyncHandler(async (req, res) =>{
+    const students = await User.find({role: "student"}).select("-password -refreshToken");
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(200, students, "Students fetched successfully")
+    )
+})
+
+const getAllTeachers = asyncHandler(async (req, res) =>{
+    const teachers = await User.find({role: "teacher"}).select("-password -refreshToken");
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(200, teachers, "Teachers fetched successfully")
+    )
+})
+
 export {
     registerUser,
     loginUser,
@@ -308,4 +327,6 @@ export {
     changeCurrentPassword,
     updateAccountDetails,
     updateUserAvatar,
+    getAllStudents,
+    getAllTeachers,
 };
