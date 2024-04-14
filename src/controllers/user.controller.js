@@ -2,7 +2,8 @@ import { User } from "../models/user.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import {ApiResponse} from "../utils/ApiResponse.js";
 import {asyncHandler} from "../utils/asyncHandler.js";
-import { uploadOnCloudinary } from "../utils/cloudinary.service.js";
+import { uploadOnCloudinary, deleteFromCloudinary } from "../utils/cloudinary.service.js";
+import jwt from "jsonwebtoken";
 
 const generateAccessAndRefreshToken = async (userId) => {
     try {
@@ -22,12 +23,11 @@ const registerUser = asyncHandler(async (req, res) => {
 
     if (
         [fullName, email, password, role, dept].some((field) => {
-            if (field?.trim() === "") {
-                throw new ApiError(400, `${field} is required`);
+            if (field === "" || field === undefined) {
+                throw new ApiError(400, `All fields are required`);
             }
         })
     );
-
     if (!["teacher", "student"].includes(role)) {
         throw new ApiError(400, "Role must be either teacher or student");
     }
@@ -43,22 +43,23 @@ const registerUser = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Avatar is required");
     }
 
+// console.log(avatarLocalPath);
     const avatar = await uploadOnCloudinary(avatarLocalPath);
 
+    // console.log(avatar);
+
     if (!avatar) {
-        throw new ApiError(500, "Error uploading avatar");
+        throw new ApiError(400, "avatar is required");
     }
 
-    const user = new User({
+    const user = await User.create({
         fullName,
-        email,
+        email: email.toLowerCase(),
         password,
         role,
         avatar: avatar?.secure_url,
         dept,
     });
-
-    await user.save();
 
     const createdUser = await User.findById(user._id).select(
         "-password -refreshToken"
@@ -67,7 +68,7 @@ const registerUser = asyncHandler(async (req, res) => {
     if (!createdUser) {
         throw new ApiError(500, "Error creating user");
     }
-
+    
     return res
         .status(201)
         .json(
@@ -205,7 +206,7 @@ const changeCurrentPassword = asyncHandler(async (req, res) => {
 
     const user = await User.findById(req.user?._id);
 
-    const isPasswordValid = await user.isPasswordCorrect(oldPassword);
+    const isPasswordValid = await user.comparePassword(oldPassword);
 
     if (!isPasswordValid) {
         throw new ApiError(400, "Incorrect password");
@@ -231,7 +232,7 @@ const updateAccountDetails = asyncHandler(async (req, res)=>{
     const {fullName, email} = req.body;     // we are only allowing email and fullName to be updated and not username.
     // We'll write separate controllers for updating coverImage and avatar
     if(!(email || fullName)){
-        throw new ApiError(400, "All fields are required");
+        throw new ApiError(400, "email or fullName required");
     }
 
     if(email){
@@ -325,6 +326,7 @@ export {
     logOutUser,
     refreshAccessToken,
     changeCurrentPassword,
+    getCurrentUser,
     updateAccountDetails,
     updateUserAvatar,
     getAllStudents,
