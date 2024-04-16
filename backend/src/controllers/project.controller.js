@@ -58,18 +58,14 @@ const createProject = asyncHandler(async (req, res) => {
         admin: req.user._id,
     });
 
-    project.validate({
-        fields: ["title", "description", "teacher", "students"],
-    });
-
     // when we add the teacher, a request will be made to the teacher to approve the project
     // if he rejects it, can edit the the teacher field and add another teacher
 
     await project.save({ validateBeforeSave: false });
 
     const createdProject = await Project.findById(project._id).populate({
-        path: "teacher students",
-        select: "role fullName email dept avatar admin",
+        path: "teacher students admin",
+        select: "role fullName email dept avatar",
     });
 
     res.status(201).json(
@@ -90,8 +86,8 @@ const getProjectById = asyncHandler(async (req, res) => {
     }
 
     const project = await Project.findById(projectId).populate({
-        path: "teacher students",
-        select: "role fullName email dept avatar admin",
+        path: "teacher students admin",
+        select: "role fullName email dept avatar",
     });
 
     if (!project) {
@@ -128,8 +124,8 @@ const getUserProjects = asyncHandler(async (req, res) => {
     const projects = await Project.find({
         $or: [{ students: userId }, { teacher: userId }],
     }).populate({
-        path: "teacher students",
-        select: "role fullName email dept avatar admin",
+        path: "teacher students admin",
+        select: "role fullName email dept avatar",
     });
 
     if (!projects) {
@@ -154,8 +150,8 @@ const getProjectRequest = asyncHandler(async (req, res) => {
         teacher: req.user._id,
         isApproved: false,
     }).populate({
-        path: "teacher students",
-        select: "role fullName email dept avatar admin",
+        path: "teacher students admin",
+        select: "role fullName email dept avatar",
     });
 
     if (!projects) {
@@ -204,13 +200,59 @@ const approveProject = asyncHandler(async (req, res) => {
         },
         { new: true }
     ).populate({
-        path: "teacher students",
-        select: "role fullName email dept avatar admin",
+        path: "teacher students admin",
+        select: "role fullName email dept avatar",
     });
 
     return res
         .status(200)
         .json(new ApiResponse(200, approvedProject, "Project approved successfully"));
+});
+
+const rejectProject = asyncHandler(async (req, res) =>{
+    // Only the teacher can reject a project
+
+    if (req.user?.role !== "teacher") {
+        throw new ApiError(403, "Only teachers can reject a project");
+    }
+
+    const { projectId } = req.params;
+
+    if (!projectId) {
+        throw new ApiError(400, "Project ID is required");
+    }
+
+    if (!isValidObjectId(projectId)) {
+        throw new ApiError(400, "Invalid project ID");
+    }
+
+    const project = await Project.findById(projectId);
+
+    if (!project) {
+        throw new ApiError(404, "Project not found");
+    }
+
+    if (req.user?._id.toString() !== project.teacher._id.toString()) {
+        throw new ApiError(
+            403,
+            "You are not authorized to reject this project"
+        );
+    }
+
+    const rejectedProject = await Project.findByIdAndUpdate(
+        { _id: projectId },
+        {
+            isApproved: false,
+        },
+        { new: true }
+    ).populate({
+        path: "teacher students admin",
+        select: "role fullName email dept avatar",
+    });
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, rejectedProject, "Project rejected successfully"));
 });
 
 const updateProject = asyncHandler(async (req, res) => {
@@ -292,8 +334,8 @@ const updateProject = asyncHandler(async (req, res) => {
     await project.save({ validateBeforeSave: false });
 
     const updatedProject = await Project.findById(projectId).populate({
-        path: "teacher students",
-        select: "role fullName email dept avatar admin",
+        path: "teacher students admin",
+        select: "role fullName email dept avatar",
     });
 
     if(!updatedProject){

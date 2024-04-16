@@ -24,5 +24,6 @@ router
     .patch(updateProject)
     .delete(deleteProject);
 router.route("/approve/:projectId").patch(approveProject);
+router.route("/reject/:projectId")
 
 export default router;
