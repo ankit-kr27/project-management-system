@@ -29,6 +29,11 @@ const projectSchema = new Schema(
                 ],
             },
         ],
+        admin: {
+            type: Schema.Types.ObjectId,
+            ref: "User",
+            required: true,
+        },
         deadline1: {
             type: Date,
             required: true,

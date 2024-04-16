@@ -6,7 +6,6 @@ import {
     getUserProjects,
     updateProject,
     deleteProject,
-    getAllProjectsUnderTeacher,
     getProjectRequest,
     approveProject,
 } from "../controllers/project.controller.js";
@@ -17,14 +16,13 @@ router.use(verifyJWT)
 
 // *** Routes ***
 router.route("/create").post(createProject);
-router.route("/t").get(getAllProjectsUnderTeacher);
+router.route("/user-projects").get(getUserProjects);
+router.route("/requests").get(getProjectRequest);
 router
-    .route("/:projectId")
+    .route("/p/:projectId")
     .get(getProjectById)
     .patch(updateProject)
     .delete(deleteProject);
-router.route("/s").get(getUserProjects);
-router.route("/requests").get(getProjectRequest);
 router.route("/approve/:projectId").patch(approveProject);
 
 export default router;
