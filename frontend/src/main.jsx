@@ -19,7 +19,7 @@ const router = createBrowserRouter([
         errorElement: <ErrorPage />,
         children: [
             {
-                path: "/:userId",
+                path: "/",
                 element: (
                     <AuthLayout authentication={true}>
                         <Homepage />

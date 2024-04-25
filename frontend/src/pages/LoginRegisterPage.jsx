@@ -5,7 +5,7 @@ import animationData from "../../public/lotties/Animation - 1713635685590.json"
 
 const LoginRegisterPage = () => {
   return (
-      <div className='flex justify-around items-center pt-24'>
+      <div className='flex justify-around items-center pt-[10vh]'>
           <div>
               <Lottie
                   options={{

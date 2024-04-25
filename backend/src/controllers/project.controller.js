@@ -396,4 +396,5 @@ export {
     deleteProject,
     getProjectRequest,
     approveProject,
+    rejectProject,
 };

@@ -15,7 +15,7 @@ const AuthLayout = ({ children, authentication = true }) => {
 
     useEffect(() => {
         if(authentication && !isAuthenticated){
-            navigate('/login')
+            navigate('/lr/login')
         } else if(!authentication && isAuthenticated){  // If the user is authenticated and the authentication is false then navigate to the home page
             // for example if the user hits /login and he is already logged in, then go to homepage
             navigate('/')
@@ -23,7 +23,7 @@ const AuthLayout = ({ children, authentication = true }) => {
         setLoader(false);
     }, [isAuthenticated, navigate, authentication]);
 // if the user is authenticated and the authetication is true then render the children components else show the loading message
-    return loader ? <div>Loading...</div> : <>{children}</>;
+    return loader ? <div></div> : <>{children}</>;
 };
 
 export default AuthLayout;

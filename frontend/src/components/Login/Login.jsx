@@ -16,15 +16,17 @@ const Login = () => {
     const navigate = useNavigate();
     const [error, setError] = useState("");
 
+    axios.defaults.withCredentials = true;
+
     const loginUser = async (data) => {
         setError("");   // Clear the error message
         console.log(data);
         try{
             const response = await axios.post(
-                `http://localhost:8000/api/v1/users/login`,
+                `${import.meta.env.VITE_BACKEND_URL}api/v1/users/login`,
                 data
             );
-            console.log(response.data);
+            // console.log(response.data);
             if(response.data.success){
                 dispatch(login(response.data));
                 navigate("/");
@@ -54,7 +56,11 @@ const Login = () => {
                         },
                     })}
                 />
-                {errors.email && <p>{errors.email.message}</p>}
+                {errors.email && (
+                    <p className="text-sm text-red-600">
+                        {errors.email.message}
+                    </p>
+                )}
 
                 <input
                     className="text-shade9 border-shade4 mb-4 h-10 w-full rounded-lg border-2 px-2 focus:outline-none"
@@ -68,8 +74,12 @@ const Login = () => {
                         },
                     })}
                 />
-                {errors.password && <p>{errors.password.message}</p>}
-                {error && <p>{error}</p>}
+                {errors.password && (
+                    <p className="text-sm text-red-600">
+                        {errors.password.message}
+                    </p>
+                )}
+                {error && <p className="text-sm text-red-600">{error}</p>}
                 <button
                     type="submit"
                     className="border-1 hover:bg-shade7 bg-shade6 text-shade1 mt-4 rounded-lg px-4 py-2 font-bold transition-all duration-300 ease-in-out"
@@ -77,7 +87,7 @@ const Login = () => {
                     Login
                 </button>
             </form>
-            <div className="flex gap-2">
+            <div className="flex gap-2 pt-2 text-sm">
                 <p>Don&apos;t have an account </p>
                 <Link to="/lr/register">
                     <span className="text-blue-500">Register</span>
