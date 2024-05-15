@@ -10,6 +10,7 @@ const ProfileCard = () => {
     const navigate = useNavigate();
 
     const accessToken = useSelector((state) => state.auth.accessToken);
+    const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
     
     const logoutHandler = async () => {
         try {
@@ -50,7 +51,7 @@ const ProfileCard = () => {
                 className="text-shade9 hover:bg-shade3 text-md flex cursor-pointer gap-2 rounded-lg px-2 py-1 font-semibold transition-all duration-300 ease-in-out"
                 onClick={logoutHandler}
             >
-                <p>Logout</p>
+                {isAuthenticated && <p>Logout</p>}
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 24 24"

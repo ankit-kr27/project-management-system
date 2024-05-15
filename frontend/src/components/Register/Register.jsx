@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
+import Loading from "../Loading/Loading.jsx";
 
 const Register = () => {
     const {
@@ -12,58 +13,63 @@ const Register = () => {
         formState: { errors },
     } = useForm();
 
+    const [isLoading, setIsLoading] = useState(false);
+
     const [error, setError] = useState("");
+    const [avatar, setAvatar] = useState(null)
 
     const [avatarPreview, setAvatarPreview] = useState(null);
     const navigate = useNavigate();
 
     const handleAvatarChange = (event) => {
-        setError(""); // Clear the error message
-        errors.avatar = null; // Clear the error message
-        const file = event.target.files[0]; // Get the selected file
-        // console.log(file);
-        // Preview the selected image file
+        setError("");
+        // errors.avatar = null; 
+        const file = event.target.files[0]; 
         if (file && file.type.substr(0, 5) === "image") {
             const reader = new FileReader();
             reader.onloadend = () => {
-                setAvatarPreview(reader.result); // Set the preview image URL
-                // setValue("avatar", reader.result);
-                // console.log(reader.result)
+                setAvatarPreview(reader.result); 
             };
-            reader.readAsDataURL(file); // Read the file as a data URL
-            setValue("avatar", file);
+            reader.readAsDataURL(file);
+            // setValue("avatar", file);
+            setAvatar(file)
         }
         else{
             setAvatarPreview(null);
-            setValue("avatar", null);
+            // setValue("avatar", null);
+            setAvatar(null)
+            setError("Invalid Image")
         }
     };
 
     const registerUser = async (data) => {
-        console.log(data);
+        setIsLoading(true);
         const formData = new FormData();
-        formData.append("avatar", data.avatar[0]); // Access avatar directly
+        formData.append("avatar", avatar); // Access avatar directly
         formData.append("fullName", data.fullName);
         formData.append("email", data.email);
         formData.append("password", data.password);
         formData.append("role", data.role);
         formData.append("dept", data.dept);
-
+        // console.log("he he hu hu")
         try {
             const response = await axios.post(
                 `${import.meta.env.VITE_BACKEND_URL}api/v1/users/register`,
                 formData
             );
-            console.log(response.data);
-            navigate("/login");
+            // console.log(response.data);
+            setIsLoading(false);
+            navigate("/lr/login");
         } catch (error) {
             console.log(error);
             setError(error.response.data.message);
         }
     };
-
+    if(isLoading) return (
+        <Loading />
+    )
     return (
-        <div className="bg-shade4 flex w-[25vw] flex-col items-center justify-around rounded-lg py-6">
+        <div className="flex w-[25vw] flex-col items-center justify-around rounded-lg bg-shade4 py-6">
             <h3 className="text-2xl font-bold">Register User</h3>
             <form
                 onSubmit={handleSubmit(registerUser)}
@@ -71,7 +77,7 @@ const Register = () => {
             >
                 <label
                     htmlFor="avatar"
-                    className="text-shade7 m-4 flex cursor-pointer flex-col items-center"
+                    className="m-4 flex cursor-pointer flex-col items-center text-shade7"
                 >
                     <span className="text-xs">Upload Avatar</span>
                     {avatarPreview ? (
@@ -95,9 +101,7 @@ const Register = () => {
                 <input
                     type="file"
                     accept="image/*"
-                    {...register("avatar", {
-                        required: "Avatar is required",
-                    })}
+                    name="avatar"
                     onChange={handleAvatarChange}
                     id="avatar"
                     className="hidden"
@@ -110,7 +114,7 @@ const Register = () => {
                 )}
 
                 <input
-                    className="text-shade9 border-shade4 mb-4 h-10 w-full rounded-lg border-2 px-2 focus:outline-none"
+                    className="mb-4 h-10 w-full rounded-lg border-2 border-shade4 px-2 text-shade9 focus:outline-none"
                     placeholder="Full Name"
                     {...register("fullName", {
                         required: "Full Name is required",
@@ -124,7 +128,7 @@ const Register = () => {
                 )}
 
                 <input
-                    className="text-shade9 border-shade4 mb-4 h-10 w-full rounded-lg border-2 px-2 focus:outline-none"
+                    className="mb-4 h-10 w-full rounded-lg border-2 border-shade4 px-2 text-shade9 focus:outline-none"
                     placeholder="Email"
                     {...register("email", {
                         required: "Email is required",
@@ -142,7 +146,7 @@ const Register = () => {
                 )}
 
                 <input
-                    className="text-shade9 border-shade4 mb-4 h-10 w-full rounded-lg border-2 px-2 focus:outline-none"
+                    className="mb-4 h-10 w-full rounded-lg border-2 border-shade4 px-2 text-shade9 focus:outline-none"
                     type="password"
                     placeholder="Password"
                     {...register("password", {
@@ -159,10 +163,10 @@ const Register = () => {
                     </div>
                 )}
 
-                <div className="text-shade6 flex gap-2">
+                <div className="flex gap-2 text-shade6">
                     <div>
                         <select
-                            className="text-shade9 border-shade4 mb-4 h-9 w-full rounded-lg border-2 px-2 focus:outline-none"
+                            className="mb-4 h-9 w-full rounded-lg border-2 border-shade4 px-2 text-shade9 focus:outline-none"
                             id="role"
                             {...register("role", {
                                 required: "Role is required",
@@ -176,7 +180,7 @@ const Register = () => {
 
                     <div>
                         <select
-                            className="text-shade9 border-shade4 mb-4 h-9 w-full rounded-lg border-2 px-2 focus:outline-none"
+                            className="mb-4 h-9 w-full rounded-lg border-2 border-shade4 px-2 text-shade9 focus:outline-none"
                             id="dept"
                             {...register("dept", {
                                 required: "Department is required",
@@ -204,7 +208,7 @@ const Register = () => {
                 {error && <p className="text-sm text-red-600">{error}</p>}
                 <button
                     type="submit"
-                    className="border-1 hover:bg-shade7 bg-shade6 text-shade1 mt-4 rounded-lg px-4 py-2 font-bold transition-all duration-300 ease-in-out"
+                    className="border-1 mt-4 rounded-lg bg-shade6 px-4 py-2 font-bold text-shade1 transition-all duration-300 ease-in-out hover:bg-shade7"
                 >
                     Register
                 </button>

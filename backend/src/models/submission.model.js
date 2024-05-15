@@ -38,4 +38,4 @@ const submissionSchema = new Schema(
     { timestamps: true }
 );
 
-const Submission = mongoose.model("Submission", submissionSchema);
+export const Submission = mongoose.model("Submission", submissionSchema);
