@@ -85,10 +85,14 @@ const getProjectById = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Invalid project ID");
     }
 
-    const project = await Project.findById(projectId).populate({
-        path: "teacher students admin",
-        select: "role fullName email dept avatar",
-    });
+    const project = await Project.findById(projectId)
+        .populate({
+            path: "teacher students admin",
+            select: "role fullName email dept avatar",
+        })
+        .populate({
+            path: "submissions",
+        });
 
     if (!project) {
         throw new ApiError(404, "Project not found");
@@ -123,10 +127,14 @@ const getUserProjects = asyncHandler(async (req, res) => {
 
     const projects = await Project.find({
         $or: [{ students: userId }, { teacher: userId }],
-    }).populate({
-        path: "teacher students admin",
-        select: "role fullName email dept avatar",
-    });
+    })
+        .populate({
+            path: "teacher students admin",
+            select: "role fullName email dept avatar",
+        })
+        .populate({
+            path: "submissions",
+        });
 
     return res
         .status(200)
@@ -201,7 +209,13 @@ const approveProject = asyncHandler(async (req, res) => {
 
     return res
         .status(200)
-        .json(new ApiResponse(200, approvedProject, "Project approved successfully"));
+        .json(
+            new ApiResponse(
+                200,
+                approvedProject,
+                "Project approved successfully"
+            )
+        );
 });
 
 const updateProject = asyncHandler(async (req, res) => {
@@ -211,87 +225,105 @@ const updateProject = asyncHandler(async (req, res) => {
 
     const { projectId } = req.params;
 
-    if(!projectId){
+    if (!projectId) {
         throw new ApiError(400, "Missing project id");
     }
 
-    if(!isValidObjectId(projectId)){
+    if (!isValidObjectId(projectId)) {
         throw new ApiError(400, "Invalid project id");
     }
 
     const project = await Project.findById(projectId);
 
-    if(!project){
-        throw new ApiError(404, "Project not found")
+    if (!project) {
+        throw new ApiError(404, "Project not found");
     }
-// *****************************************************
+    // *****************************************************
 
     const requestingUser = User.findById(req.user._id);
 
-    if(!requestingUser){
+    if (!requestingUser) {
         throw new ApiError(404, "User not found");
     }
 
-    if(requestingUser.role === "teacher"){
+    if (requestingUser.role === "teacher") {
         const { deadline1, deadline2 } = req.body;
 
-        if(project.teacher.toString() !== req.user._id.toString()){
-            throw new ApiError(403, "You are not authorized to update this project");
+        if (project.teacher.toString() !== req.user._id.toString()) {
+            throw new ApiError(
+                403,
+                "You are not authorized to update this project"
+            );
         }
 
-        if(deadline1) project.deadline1 = deadline1;
-        if(deadline2) project.deadline2 = deadline2;
-    }else{
+        if (deadline1) project.deadline1 = deadline1;
+        if (deadline2) project.deadline2 = deadline2;
+    } else {
         const { title, description, teacher, student } = req.body;
 
-        if(teacher){
-            if(project.isApproved){
-                throw new ApiError(403, "You can't update the teacher of an approved project");
+        if (teacher) {
+            if (project.isApproved) {
+                throw new ApiError(
+                    403,
+                    "You can't update the teacher of an approved project"
+                );
             }
-            if(project.admin.toString() !== req.user?._id.toString()){
-                throw new ApiError(403, "You are not authorized to update the teacher of this project");
+            if (project.admin.toString() !== req.user?._id.toString()) {
+                throw new ApiError(
+                    403,
+                    "You are not authorized to update the teacher of this project"
+                );
             }
-            if(!isValidObjectId(teacher)){
+            if (!isValidObjectId(teacher)) {
                 throw new ApiError(400, "Invalid teacher id");
             }
             const teacherExists = await User.exists({
                 $and: [{ _id: teacher }, { role: "teacher" }],
             });
-            if(!teacherExists){
+            if (!teacherExists) {
                 throw new ApiError(404, "Teacher not found");
             }
             project.teacher = teacher;
             project.isApproved = false;
         }
 
-        if(student){
-            if(project.isApproved){
-                throw new ApiError(403, "You can't update the student of an approved project");
+        if (student) {
+            if (project.isApproved) {
+                throw new ApiError(
+                    403,
+                    "You can't update the student of an approved project"
+                );
             }
-            if(project.admin.toString() !== req.user?._id.toString()){
-                throw new ApiError(403, "You are not authorized to update the student of this project");
+            if (project.admin.toString() !== req.user?._id.toString()) {
+                throw new ApiError(
+                    403,
+                    "You are not authorized to update the student of this project"
+                );
             }
-            if(!isValidObjectId(student)){
+            if (!isValidObjectId(student)) {
                 throw new ApiError(400, "Invalid student id");
             }
             const studentExists = await User.exists({
                 $and: [{ _id: student }, { role: "student" }],
             });
-            if(!studentExists){
+            if (!studentExists) {
                 throw new ApiError(404, "Student not found");
             }
-            if(project.students.includes(student)){
+            if (project.students.includes(student)) {
                 throw new ApiError(400, "Student already in the project");
             }
             project.students = [project.admin, student];
         }
 
-        if(title && project.isApproved){
-            throw new ApiError(403, "You can't update the title of an approved project");
+        if (title && project.isApproved) {
+            throw new ApiError(
+                403,
+                "You can't update the title of an approved project"
+            );
         }
-        if(title) project.title = title;
+        if (title) project.title = title;
 
-        if(description) project.description = description;
+        if (description) project.description = description;
 
         project.validate({
             fields: ["title", "description", "teacher", "students"],
@@ -304,14 +336,16 @@ const updateProject = asyncHandler(async (req, res) => {
             select: "role fullName email dept avatar",
         });
 
-        if(!updatedProject){
+        if (!updatedProject) {
             throw new ApiError(500, "Error updating project");
         }
     }
 
     return res
         .status(200)
-        .json(new ApiResponse(200, updatedProject, "Project updated successfully"));
+        .json(
+            new ApiResponse(200, updatedProject, "Project updated successfully")
+        );
 });
 
 const deleteProject = asyncHandler(async (req, res) => {

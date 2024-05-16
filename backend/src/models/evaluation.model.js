@@ -2,11 +2,6 @@ import mongoose, { Schema } from "mongoose";
 
 const evaluationSchema = new Schema(
     {
-        submission: {
-            type: Schema.Types.ObjectId,
-            ref: "Submission",
-            required: true,
-        },
         criteria: {
             scopeOrCreative: { type: Number, default: 0, min: 1, max: 10 },
             managementAndPlanning: {

@@ -2,10 +2,15 @@ import mongoose, {Schema} from "mongoose";
 
 const submissionSchema = new Schema(
     {
-        project: {
+        student: {
             type: Schema.Types.ObjectId,
-            ref: "Project",
+            ref: "User",
             required: true,
+        },
+        workingDescription: {
+            type: String,
+            required: true,
+            trim: true,
         },
         stage: {
             type: String,
@@ -33,6 +38,10 @@ const submissionSchema = new Schema(
         isEvauated: {
             type: Boolean,
             default: false,
+        },
+        evaluation: {
+            type: Schema.Types.ObjectId,
+            ref: "Evaluation"
         }
     },
     { timestamps: true }

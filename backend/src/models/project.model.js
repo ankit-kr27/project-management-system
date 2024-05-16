@@ -46,6 +46,10 @@ const projectSchema = new Schema(
             type: Boolean,
             default: false,
         },
+        submissions: [{
+            type: Schema.Types.ObjectId, 
+            ref: "Submission" 
+        }],
     },
     { timestamps: true }
 );
