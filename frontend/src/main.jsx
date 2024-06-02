@@ -11,6 +11,7 @@ import AuthLayout from './components/AuthLayout/AuthLayout'
 import LoginRegisterPage from './pages/LoginRegisterPage.jsx'
 import Login from './components/Login/Login.jsx'
 import Register from './components/Register/Register.jsx'
+import Project from './components/Project/Project.jsx'
 
 const router = createBrowserRouter([
     {
@@ -25,6 +26,12 @@ const router = createBrowserRouter([
                         <Homepage />
                     </AuthLayout>
                 ),
+                children: [
+                    {
+                        path: "/project/:projectId",
+                        element: <Project />,
+                    },
+                ],
             },
             {
                 path: "/lr",

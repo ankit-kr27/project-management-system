@@ -26,7 +26,7 @@ const Login = () => {
                 `${import.meta.env.VITE_BACKEND_URL}api/v1/users/login`,
                 data
             );
-            // console.log(response.data);
+            console.log(response.data);
             if(response.data.success){
                 dispatch(login(response.data));
                 navigate("/");

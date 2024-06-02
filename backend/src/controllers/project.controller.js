@@ -167,6 +167,18 @@ const approveProject = asyncHandler(async (req, res) => {
     // Only the teacher can approve a project
     const { deadline1, deadline2 } = req.body;
 
+    if (!deadline1 || !deadline2)
+        throw new ApiError(400, "Both deadlines are required");
+
+    if (new Date(deadline1) < new Date())
+        throw new ApiError(400, "Deadline 1 must be in the future");
+
+    if (new Date(deadline2) < new Date())
+        throw new ApiError(400, "Deadline 2 must be in the future");
+
+    if (new Date(deadline1) > new Date(deadline2))
+        throw new ApiError(400, "Deadline 2 must be after deadline 1");
+
     if (req.user?.role !== "teacher") {
         throw new ApiError(403, "Only teachers can approve a project");
     }
